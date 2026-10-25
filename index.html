@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday Jana! | From Dante</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #090a0f;
+      color: #fff;
+    }
+
+    /* BACKGROUND CANVAS */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* SCENE CONTAINER */
+    .scene-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      margin-top: 10px;
+      animation: fadeInDown 1.5s ease;
+    }
+    header h1 {
+      font-size: 2.8rem;
+      color: #ffd700;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 105, 180, 0.4);
+      letter-spacing: 2px;
+    }
+    header p {
+      font-size: 1.2rem;
+      color: #e0e0e0;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    /* CAKE STYLING */
+    .cake-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .pedestal {
+      width: 280px;
+      height: 20px;
+      background: linear-gradient(90deg, #444, #888, #444);
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+    }
+
+    .cake-tier {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
+      border-radius: 10px 10px 0 0;
+      box-shadow: inset 0 5px 10px rgba(255,255,255,0.5), 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .tier-bottom {
+      width: 220px;
+      height: 70px;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    }
+    .tier-middle {
+      width: 170px;
+      height: 60px;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    }
+    .tier-top {
+      width: 120px;
+      height: 50px;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+
+    /* CANDLES */
+    .candles-group {
+      position: absolute;
+      top: -30px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      width: 100%;
+    }
+    .candle {
+      width: 10px;
+      height: 30px;
+      background: linear-gradient(to bottom, #fff, #ff6b6b);
+      border-radius: 3px;
+      position: relative;
+    }
+    .flame {
+      width: 12px;
+      height: 18px;
+      background: radial-gradient(ellipse at bottom, #ffff00, #ff4500);
+      border-radius: 50% 50% 20% 20%;
+      position: absolute;
+      top: -18px;
+      left: -1px;
+      box-shadow: 0 0 10px #ff4500, 0 0 20px #ffff00;
+      animation: flicker 0.2s infinite alternate;
+      transition: opacity 0.5s ease;
+    }
+    .flame.off {
+      opacity: 0;
+      box-shadow: none;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-2deg); }
+      100% { transform: scale(1.1) rotate(2deg); }
+    }
+
+    /* AUDIO CARD */
+    .player-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 15px 25px;
+      width: 90%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      margin-bottom: 20px;
+    }
+    .track-info {
+      text-align: center;
+    }
+    .track-title {
+      font-weight: bold;
+      font-size: 1.15rem;
+      color: #ffd700;
+    }
+    .track-subtitle {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 2px;
+    }
+    .audio-visualizer {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      height: 25px;
+      margin-top: 5px;
+    }
+    .bar {
+      width: 4px;
+      height: 100%;
+      background: #ffd700;
+      border-radius: 2px;
+      animation: bounce 1s ease-in-out infinite alternate;
+    }
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    .bar:nth-child(4) { animation-delay: 0.1s; }
+    .bar:nth-child(5) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0% { height: 15%; }
+      100% { height: 100%; }
+    }
+
+    /* START OVERLAY */
+    #startOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 5, 10, 0.94);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      cursor: pointer;
+    }
+    #startOverlay h2 {
+      font-size: 2.2rem;
+      color: #ffd700;
+      margin-bottom: 15px;
+    }
+    #startOverlay p {
+      font-size: 1.1rem;
+      color: #ddd;
+      margin-bottom: 25px;
+    }
+    .start-btn {
+      background: linear-gradient(45deg, #ff6b6b, #ffd700);
+      border: none;
+      padding: 15px 35px;
+      border-radius: 30px;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+    }
+
+    /* LETTER MODAL */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 50;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: #1a1a2e;
+      border: 1px solid #ffd700;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+      position: relative;
+    }
+    .modal-content h3 {
+      color: #ffd700;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+    .modal-content p {
+      color: #e0e0e0;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      background: #ffd700;
+      color: #000;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Stars & Particles Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Tap to Start Overlay (Initial User Tap to Trigger Autoplay) -->
+  <div id="startOverlay" onclick="startAudio()">
+    <h2>A Special Birthday Evening</h2>
+    <p>Dedicated to <strong>Jana</strong> — Crafted with ❤️ by <strong>Dante</strong></p>
+    <button class="start-btn">Tap to Play Music & Begin 🎵</button>
+  </div>
+
+  <!-- HTML5 Audio element with direct audio file stream -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://archive.org/download/Fhlip2/Calum%20Scott%20-%20You%20Are%20The%20Reason.mp3" type="audio/mpeg">
+    <source src="you-are-the-reason.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Main Scene UI -->
+  <div class="scene-container">
+    
+    <header>
+      <h1>Happy Birthday, Jana! 🎉</h1>
+      <p>Created specially for you by Dante</p>
+    </header>
+
+    <!-- Interactive Birthday Cake -->
+    <div class="cake-container" id="cake" onclick="blowCandles()">
+      <div class="candles-group">
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+      </div>
+      <div class="cake-tier tier-top"></div>
+      <div class="cake-tier tier-middle"></div>
+      <div class="cake-tier tier-bottom"></div>
+      <div class="pedestal"></div>
+    </div>
+
+    <!-- Audio Player Card -->
+    <div class="player-card">
+      <div class="track-info">
+        <div class="track-title">You Are The Reason</div>
+        <div class="track-subtitle">Calum Scott</div>
+      </div>
+      <div class="audio-visualizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Birthday Letter Modal -->
+  <div class="modal" id="letterModal">
+    <div class="modal-content">
+      <h3>Dear Jana,</h3>
+      <p>
+        On your special day, I wanted to create something truly magical for you. 
+        May your year ahead be as bright as the stars, filled with warmth, endless laughter, 
+        and all the happiness you bring into the world.
+      </p>
+      <p><strong>With love,<br>Dante</strong></p>
+      <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Canvas background animation
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.radius = Math.random() * 2 + 0.5;
+        this.alpha = Math.random();
+        this.speed = Math.random() * 0.02 + 0.005;
+        this.color = Math.random() > 0.3 ? '#ffd700' : '#ffffff';
+      }
+      update() {
+        this.alpha += this.speed;
+        if (this.alpha > 1 || this.alpha < 0) this.speed = -this.speed;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = Math.abs(this.alpha);
+        ctx.fill();
+      }
+    }
+
+    const particles = Array.from({ length: 90 }, () => new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      let grad = ctx.createLinearGradient(0, 0, 0, height);
+      grad.addColorStop(0, '#090a0f');
+      grad.addColorStop(1, '#1b1c2e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Trigger direct HTML5 Audio play
+    function startAudio() {
+      document.getElementById('startOverlay').style.display = 'none';
+      const audio = document.getElementById('bgMusic');
+      audio.play().catch(err => {
+        console.warn("Audio playback issue:", err);
+      });
+    }
+
+    // Candle blow functionality
+    let candlesBlown = false;
+
+    function blowCandles() {
+      if (candlesBlown) return;
+      const flames = document.querySelectorAll('.flame');
+      flames.forEach(flame => flame.classList.add('off'));
+      candlesBlown = true;
+
+      setTimeout(() => {
+        document.getElementById('letterModal').style.display = 'flex';
+      }, 600);
+    }
+
+    function closeModal() {
+      document.getElementById('letterModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
